@@ -1,23 +1,21 @@
 <template>
-    <div class="music-panel">
+    <div class="content-container music-panel">
         <div class="player">
             <audio id="music" src="" />
             <div class="music-content">
                 <img class="music-cover" src="@/assets/default-cover.jpg" />
 
                 <div class="music-info">
-                    <div>
-                        <div id="music-title">{{ musicInfo.title }}</div>
-                        <div class="secondary" id="music-artists">
-                            {{ musicInfo.artist }}
-                        </div>
-                        <div class="secondary" id="music-orderer">
-                            由 {{ musicInfo.orderer }} 点歌
-                        </div>
+                    <div id="music-title">{{ musicInfo.title }}</div>
+                    <div class="secondary" id="music-artists">
+                        {{ musicInfo.artist }}
+                    </div>
+                    <div class="secondary" id="music-orderer">
+                        由 {{ musicInfo.orderer }} 点歌
                     </div>
                 </div>
             </div>
-            <div class="secondary music-source-info">
+            <div class="music-source-info">
                 曲库来自<span class="netease-logo"
                     ><img
                         class="netease-icon"
@@ -26,7 +24,7 @@
                 >
             </div>
         </div>
-        <div class="secondary music-playlist-container">
+        <div class="music-playlist-container">
             <ol class="music-playlist" id="playlist">
                 <li v-for="music in playlist" v-bind:key="music">
                     {{ music }}
@@ -62,16 +60,12 @@ export default {
 
 
 <style lang="scss" scoped>
-// @import url("~@/assets/scss/imports.scss");
+// @import url("~@/assets/scss/_imports.scss");
 
 .music-panel {
     white-space: nowrap;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    background-color: #121212;
-    // background-color: $primary-color;
-    border-radius: 12px;
-    padding: 10px;
 }
 
 .player {
@@ -79,28 +73,29 @@ export default {
 }
 
 .music-content {
-    display: flex;
+    display: grid;
+    grid-template-columns: 0fr 1fr;
 }
 
 .music-cover {
     box-shadow: black 0 5px 20px 0;
-    display: block;
-    background-color: #111111;
     height: 100px;
     width: 100px;
     border-radius: 5px;
 }
 
 .music-info {
+    @include secondary;
     display: flex;
-    align-items: center;
-    /* float: left; */
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
     padding-left: 10px;
     height: 100px;
-    /* border: 1px solid white; */
 }
 
 .music-source-info {
+    @include secondary;
     margin-top: 10px;
 }
 
@@ -122,20 +117,19 @@ export default {
 }
 
 #music-title {
-    letter-spacing: 0.04em;
-    font-weight: bold;
+    @include title;
 }
 
 .music-playlist-container {
     height: 110px;
-    background-color: #0c0c0c;
+    background-color: $darker-background-color;
     border-radius: 5px;
     padding: 10px;
     overflow: hidden;
 }
 
 .music-playlist {
-    padding: 0 1.5em;
+    padding: 0 1.5rem;
     margin: 0;
 }
 </style>
