@@ -45,4 +45,9 @@ export default {
     border-radius: 5px;
     line-height: 25px;
 }
+@media (max-width: 520px) {
+    .color-palette {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
 </style>

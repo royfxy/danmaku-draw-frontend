@@ -1,19 +1,16 @@
 <template>
     <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
     <div id="head-room">
-        <live-canvas :cols="10" :rows="10" />
+        <live-canvas :width="1440" :height="1440" :cols="30" :rows="60" :zoom="zoom" />
     </div>
     <div id="tail-room">
         <!-- <HelloWorld msg="Welcome to Your Vue.js App" /> -->
-        <h1>test</h1>
+        <button @click="zoomCanvas">zoom</button>
         <color-palette :colors="color" :key="color.id" />
         <Music />
         <auto-scroll-horizontal>
             <div>
-                <h1>
-                    12123 234234 345 456 768 456 43634 2345 2345234 234 547 678
-                    345 3245 3456 4567 56788
-                </h1>
+                <h1>512123 234234 345 456 768 456 43634 2345 23452</h1>
                 <p>{{ str }}</p>
             </div>
         </auto-scroll-horizontal>
@@ -23,6 +20,7 @@
                 <h1>12123 234234 345 456 768 456 43634 2345</h1>
             </div>
         </auto-scroll-horizontal>
+        
     </div>
 </template>
 
@@ -55,17 +53,24 @@ export default {
             15: "#d06de4",
             16: "#ffa7d1",
         };
+        const zoom = ref(1);
         let str = ref(123);
         setInterval(() => {
             str.value += 1;
         }, 5000);
-        return { color, str };
+        return { color, str, zoom };
     },
     components: {
         Music,
         ColorPalette,
         AutoScrollHorizontal,
         LiveCanvas,
+    },
+    methods: {
+        zoomCanvas() {
+            this.zoom = this.zoom == 1 ? 2 : 1;
+            console.log(this.zoom);
+        },
     },
 };
 </script>
@@ -74,9 +79,10 @@ export default {
 body {
     background-color: black;
     margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 #app {
-    font-family: sans;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: white;
@@ -92,7 +98,8 @@ body {
 }
 
 #tail-room {
-    flex: 560px 1;
+    padding: 0 10px;
+    flex: 540px 1;
     overflow: hidden;
 }
 </style>

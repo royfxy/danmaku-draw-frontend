@@ -132,4 +132,12 @@ export default {
     padding: 0 1.5rem;
     margin: 0;
 }
+
+@media (max-width: 600px) {
+    .music-panel {
+        grid-template-rows: 1fr 1fr;
+        grid-template-columns: 1fr;
+        row-gap: 10px;
+    }
+}
 </style>
