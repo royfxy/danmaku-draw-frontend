@@ -13,45 +13,49 @@
             :height="height"
             :style="canvasStyle"
             ref="gridCanvas"
+            v-show="gridShow"
         ></canvas>
         <div
-            class="coordinate"
-            id="top-coordinate"
-            :style="hCoordinateContainerStyle"
+            class="coordinate-container"
+            v-for="item in coordinateStyle"
+            :key="item"
+            :style="[item.containerStyles, canvasStyle]"
+            v-show="gridShow"
         >
             <div
-                v-for="index in cols / 5"
-                :key="index"
-                :style="hCoordinateStyle"
+                class="coordinate-num-container"
+                :style="[item.numContainerStyle, item.headStyle]"
             >
-                {{ index * 5 - 4 }}
+                <div
+                    v-for="index in Math.ceil(item.num / 5)"
+                    :key="index"
+                    :style="[
+                        item.numStyle,
+                        index % 2 == 0
+                            ? { color: '#ffffffaa' }
+                            : { fontWeight: 'bold' },
+                    ]"
+                >
+                    {{ index * 5 - 4 }}
+                </div>
             </div>
-        </div>
-        <div
-            class="coordinate"
-            id="left-coordinate"
-            :style="vCoordinateContainerStyle"
-        >
             <div
-                v-for="index in rows / 5"
-                :key="index"
-                :style="vCoordinateStyle"
+                class="coordinate-num-container"
+                :style="[item.numContainerStyle, item.tailStyle]"
+                v-show="zoom"
             >
-                {{ index * 5 - 4 }}
-            </div>
-        </div>
-        <div
-            class="coordinate"
-            id="bottom-coordinate"
-            :style="hCoordinateContainerStyle"
-            v-show="zoom == 1"
-        >
-            <div
-                v-for="index in cols / 5"
-                :key="index"
-                :style="hCoordinateStyle"
-            >
-                {{ index * 5 - 4 }}
+                <div
+                    v-for="index in Math.ceil(item.num / 5)"
+                    :key="index"
+                    :style="[
+                        item.numStyle,
+                        index % 2 == 0
+                            ? { color: '#ffffffaa' }
+                            : { fontWeight: 'bold' },
+                    ]"
+                >
+                    {{ index * 5 - 4 }}
+                </div>
             </div>
         </div>
     </div>
@@ -69,6 +73,7 @@ export default {
         width: Number,
         cols: Number,
         rows: Number,
+        colors: Object,
         minMarginSize: {
             type: Number,
             default: 50,
@@ -76,6 +81,10 @@ export default {
         zoom: {
             type: Number,
             default: 1,
+        },
+        gridShow: {
+            type: Boolean,
+            default: true,
         },
     },
     setup(props) {
@@ -162,59 +171,93 @@ export default {
                 );
             }
         },
+        drawPixel(x, y, colorId) {
+            x = x - 1;
+            y = y - 1;
+            const drawCtx = this.$refs.drawCanvas.getContext("2d");
+            drawCtx.fillStyle = this.colors[colorId];
+            drawCtx.fillRect(
+                this.marginSizeCol + this.pixelSizeCol * x,
+                this.marginSizeRow + this.pixelSizeRow * y,
+                this.pixelSizeCol,
+                this.pixelSizeRow
+            );
+        },
         computeRatio({ width }) {
             this.scaleRatio = width / this.width;
-            console.log("hCoordinateStyle:", this.hCoordinateStyle);
-            console.log(this.zoom);
-            console.log(this.pixelSizeRow * this.scaleRatio * 5 + "px");
         },
     },
     computed: {
         canvasStyle() {
             return {
-                height:
-                    "min(" + this.zoom * 100 + "vh, " + this.zoom * 100 + "vw)",
-                width:
-                    "min(" + this.zoom * 100 + "vh, " + this.zoom * 100 + "vw)",
+                height: this.zoom * 100 + "vmin",
+                width: this.zoom * 100 + "vmin",
             };
         },
-        hCoordinateStyle() {
-            return {
-                flex:
-                    this.scaleRatio * this.pixelSizeCol * 5 * this.zoom + "px",
-            };
-        },
-        hCoordinateContainerStyle() {
-            return {
-                width:
-                    this.scaleRatio *
-                        (this.width - 2 * this.marginSizeRow) *
-                        this.zoom +
-                    "px",
-                padding:
-                    "0 " +
-                    this.scaleRatio * this.marginSizeRow * this.zoom +
-                    "px",
-                lineHeight:
-                    this.scaleRatio * this.marginSizeRow * this.zoom + "px",
-                fontSize: 1 + (this.zoom - 1) / 3 + "em",
-            };
-        },
-        vCoordinateStyle() {
-            return {
-                flex:
-                    this.scaleRatio * this.pixelSizeRow * 5 * this.zoom + "px",
-            };
-        },
-        vCoordinateContainerStyle() {
-            return {
-                width: this.scaleRatio * this.marginSizeCol * this.zoom + "px",
-                paddingBottom:
-                    this.scaleRatio * this.marginSizeCol * this.zoom + "px",
-                lineHeight:
-                    this.scaleRatio * this.pixelSizeRow * this.zoom + "px",
-                fontSize: 1 + (this.zoom - 1) / 3 + "em",
-            };
+        coordinateStyle() {
+            return [
+                {
+                    flexDirection: "column",
+                    contentDirection: "row",
+                    num: this.cols,
+                    containerStyles: {
+                        flexDirection: "column",
+                    },
+                    numContainerStyle: {
+                        flexDirection: "row",
+                        margin:
+                            "0 " +
+                            this.scaleRatio * this.marginSizeCol * this.zoom +
+                            "px",
+                        height:
+                            this.scaleRatio * this.marginSizeRow * this.zoom +
+                            "px",
+                        alignItems: "center",
+                        fontSize: 1 + (this.zoom - 1) / 2 + "em",
+                    },
+                    headStyle: { top: 0 },
+                    tailStyle: { bottom: 0, marginTop: "auto" },
+                    numStyle: {
+                        flex:
+                            "0 0 " +
+                            this.scaleRatio *
+                                this.pixelSizeCol *
+                                5 *
+                                this.zoom +
+                            "px",
+                    },
+                },
+                {
+                    flexDirection: "row",
+                    contentDirection: "column",
+                    containerStyles: {
+                        flexDirection: "row",
+                    },
+                    num: this.rows,
+                    numContainerStyle: {
+                        flexDirection: "column",
+                        margin:
+                            this.scaleRatio * this.marginSizeRow * this.zoom +
+                            "px 0",
+                        width:
+                            this.scaleRatio * this.marginSizeCol * this.zoom +
+                            "px",
+                        alignItems: "center",
+                        fontSize: 1 + (this.zoom - 1) / 2 + "em",
+                    },
+                    headStyle: { left: 0 },
+                    tailStyle: { right: 0, marginLeft: "auto" },
+                    numStyle: {
+                        flex:
+                            "0 0 " +
+                            this.scaleRatio *
+                                this.pixelSizeRow *
+                                5 *
+                                this.zoom +
+                            "px",
+                    },
+                },
+            ];
         },
     },
     mounted() {
@@ -228,39 +271,33 @@ export default {
 .canvas-container {
     font-family: Courier, monospace;
     position: relative;
-    height: min(100vh, 100vw);
-    width: min(100vh, 100vw);
+    height: 100vmin;
+    width: 100vmin;
     background-color: $darker-background-color;
     overflow: overlay;
 }
+bold {
+    font-weight: bold;
+}
 canvas {
-    height: min(100vh, 100vw);
-    width: min(100vh, 100vw);
+    height: 100vmin;
+    width: 100vmin;
     position: absolute;
     top: 0;
     left: 0;
 }
-
-.coordinate {
-    // background-color: $darker-background-color;
+.coordinate-container {
+    position: absolute;
     display: flex;
-    line-height: 1em;
 }
 
-#top-coordinate {
+.coordinate-num-container {
+    display: flex;
     position: sticky;
-    top: 0;
 }
-
-#left-coordinate {
-    position: sticky;
-    left: 0;
-    align-items: center;
-    flex-direction: column;
-}
-
-#bottom-coordinate {
-    position: absolute;
-    bottom: 0;
+@media (max-height: 600px), (max-width: 600px) {
+    .coordinate-container {
+        font-size: 0.5em;
+    }
 }
 </style>

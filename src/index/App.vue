@@ -1,11 +1,22 @@
 <template>
     <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
     <div id="head-room">
-        <live-canvas :width="1440" :height="1440" :cols="30" :rows="60" :zoom="zoom" />
+        <live-canvas
+            :width="canvasParms.width"
+            :height="canvasParms.height"
+            :cols="canvasParms.cols"
+            :rows="canvasParms.rows"
+            :zoom="canvasParms.zoom"
+            :gridShow="canvasParms.gridShow"
+            :colors="color"
+            ref="canvas"
+        />
     </div>
     <div id="tail-room">
         <!-- <HelloWorld msg="Welcome to Your Vue.js App" /> -->
         <button @click="zoomCanvas">zoom</button>
+        <button @click="canvasParms.gridShow = !canvasParms.gridShow">show grid</button>
+        <button @click="drawCanvas">draw</button>
         <color-palette :colors="color" :key="color.id" />
         <Music />
         <auto-scroll-horizontal>
@@ -20,7 +31,15 @@
                 <h1>12123 234234 345 456 768 456 43634 2345</h1>
             </div>
         </auto-scroll-horizontal>
-        
+        <div
+            v-for="(item, index) in [
+                { id: 'ww', name: 'ee' },
+                { id: 'rr', name: 'tt' },
+            ]"
+            :key="index"
+        >
+            {{ item.id }}{{ item.name }}
+        </div>
     </div>
 </template>
 
@@ -30,7 +49,7 @@ import ColorPalette from "@/components/ColorPalette.vue";
 import AutoScrollHorizontal from "@/components/AutoScrollHorizontal.vue";
 import LiveCanvas from "@/components/LiveCanvas.vue";
 
-import { ref } from "vue";
+import { reactive, ref } from "vue";
 
 export default {
     name: "App",
@@ -53,12 +72,20 @@ export default {
             15: "#d06de4",
             16: "#ffa7d1",
         };
-        const zoom = ref(1);
+        const canvasParms = reactive({
+            width:1440,
+            height:1440,
+            cols:50,
+            rows:50,
+            gridShow:true,
+            zoom:1
+        })
+        const canvas = ref(null);
         let str = ref(123);
         setInterval(() => {
             str.value += 1;
         }, 5000);
-        return { color, str, zoom };
+        return { canvas, canvasParms, color, str };
     },
     components: {
         Music,
@@ -68,8 +95,20 @@ export default {
     },
     methods: {
         zoomCanvas() {
-            this.zoom = this.zoom == 1 ? 2 : 1;
+            this.canvasParms.zoom = this.canvasParms.zoom == 1 ? 2 : 1;
             console.log(this.zoom);
+        },
+        drawCanvas() {
+            function random(min, max) {
+                return Math.floor(Math.random() * (max - min) + min);
+            }
+            for (var i = 0; i < 100; i++) {
+                let x = random(1, 101),
+                    y = random(1, 101),
+                    colorId = random(1, 16);
+                console.log(x, y, colorId);
+                this.$refs.canvas.drawPixel(y, x, colorId);
+            }
         },
     },
 };
