@@ -37,23 +37,24 @@
 
 
 <script>
-import { ref } from "vue";
+import { reactive, ref } from "vue";
 
 export default {
     setup() {
-        let defaultData = {
+        const defaultData = {
             musicInfo: {
                 title: "未播放",
                 artist: "- -",
                 orderer: "- -",
             },
         };
-        let musicInfo = ref(defaultData.musicInfo);
-        let playlist = ref([]);
-        return { musicInfo, playlist };
-    },
-    methods: {
-        play() {},
+        
+        const musicInfo = reactive(defaultData.musicInfo);
+        const playlist = ref([]);
+        const play = function() {
+            
+        }
+        return { musicInfo, playlist, play};
     },
 };
 </script>

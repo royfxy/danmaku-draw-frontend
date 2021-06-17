@@ -1,23 +1,25 @@
 <template>
     <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
     <div id="head-room">
-        <live-canvas
+        <grid-canvas
             :width="canvasParms.width"
             :height="canvasParms.height"
             :cols="canvasParms.cols"
             :rows="canvasParms.rows"
             :zoom="canvasParms.zoom"
             :gridShow="canvasParms.gridShow"
-            :colors="color"
+            :colors="canvasParms.colors"
             ref="canvas"
         />
     </div>
     <div id="tail-room">
         <!-- <HelloWorld msg="Welcome to Your Vue.js App" /> -->
         <button @click="zoomCanvas">zoom</button>
-        <button @click="canvasParms.gridShow = !canvasParms.gridShow">show grid</button>
+        <button @click="canvasParms.gridShow = !canvasParms.gridShow">
+            show grid
+        </button>
         <button @click="drawCanvas">draw</button>
-        <color-palette :colors="color" :key="color.id" />
+        <color-palette :colors="canvasParms.colors" :key="canvasParms.colors" />
         <Music />
         <auto-scroll-horizontal>
             <div>
@@ -25,21 +27,6 @@
                 <p>{{ str }}</p>
             </div>
         </auto-scroll-horizontal>
-
-        <auto-scroll-horizontal>
-            <div>
-                <h1>12123 234234 345 456 768 456 43634 2345</h1>
-            </div>
-        </auto-scroll-horizontal>
-        <div
-            v-for="(item, index) in [
-                { id: 'ww', name: 'ee' },
-                { id: 'rr', name: 'tt' },
-            ]"
-            :key="index"
-        >
-            {{ item.id }}{{ item.name }}
-        </div>
     </div>
 </template>
 
@@ -47,66 +34,88 @@
 import Music from "@/components/Music.vue";
 import ColorPalette from "@/components/ColorPalette.vue";
 import AutoScrollHorizontal from "@/components/AutoScrollHorizontal.vue";
-import LiveCanvas from "@/components/LiveCanvas.vue";
+import GridCanvas from "@/components/GridCanvas.vue";
 
-import { reactive, ref } from "vue";
+import { setBaseURL, getOperation, msgHandler, connectWebsocket } from "@/api/msgHandler.js";
+
+import { nextTick, onMounted, reactive, ref } from "vue";
 
 export default {
     name: "App",
     setup() {
-        let color = {
-            1: "#ffffff",
-            2: "#d6d6d6",
-            3: "#888888",
-            4: "#212121",
-            5: "#a16b3f",
-            6: "#e60000",
-            7: "#e59502",
-            8: "#e5db00",
-            9: "#96e046",
-            10: "#03bd02",
-            11: "#00d3de",
-            12: "#0184c8",
-            13: "#0000ec",
-            14: "#81007e",
-            15: "#d06de4",
-            16: "#ffa7d1",
-        };
+        setBaseURL("https://192.168.31.119");
+
+        // Canvas
         const canvasParms = reactive({
-            width:1440,
-            height:1440,
-            cols:50,
-            rows:50,
-            gridShow:true,
-            zoom:1
-        })
+            colors: null,
+            width: 1440,
+            height: 1440,
+            cols: null,
+            rows: null,
+            gridShow: true,
+            zoom: 1,
+        });
         const canvas = ref(null);
-        let str = ref(123);
+        function drawPixel(data) {
+            function coordinateOf(pos) {
+                return [
+                    Math.floor(pos / canvasParms.cols),
+                    pos % canvasParms.cols,
+                ];
+            }
+            canvas.value.drawPixel(...coordinateOf(data.pos), data.color_id);
+        }
+
+        async function initCanvas(data) {
+            canvasParms.colors = data.colors;
+            canvasParms.cols = data.col_num;
+            canvasParms.rows = data.row_num;
+            await nextTick();
+            canvas.value.initCanvas();
+            let pixels = data.pixels;
+            await nextTick();
+            for (var i = 0; i < pixels.length; i++) {
+                if (pixels[i] !== null)
+                    drawPixel({ pos: i, color_id: pixels[i] });
+            }
+        }
+
+        msgHandler.register("INIT_CANVAS", initCanvas);
+        msgHandler.register("DRAW_PIXEL", drawPixel);
+        onMounted(() => {
+            getOperation("/api/canvas/canvas");
+        });
+        connectWebsocket("/api/canvas")
+
+        // TODO: Music
+
+        // TODO: Message
+
+        let str = ref(0);
         setInterval(() => {
             str.value += 1;
         }, 5000);
-        return { canvas, canvasParms, color, str };
+
+        return { canvas, canvasParms, str };
     },
     components: {
         Music,
         ColorPalette,
         AutoScrollHorizontal,
-        LiveCanvas,
+        GridCanvas,
     },
     methods: {
         zoomCanvas() {
             this.canvasParms.zoom = this.canvasParms.zoom == 1 ? 2 : 1;
-            console.log(this.zoom);
         },
         drawCanvas() {
             function random(min, max) {
                 return Math.floor(Math.random() * (max - min) + min);
             }
-            for (var i = 0; i < 100; i++) {
-                let x = random(1, 101),
-                    y = random(1, 101),
+            for (var i = 0; i < 50; i++) {
+                let x = random(0, 50),
+                    y = random(0, 50),
                     colorId = random(1, 16);
-                console.log(x, y, colorId);
                 this.$refs.canvas.drawPixel(y, x, colorId);
             }
         },

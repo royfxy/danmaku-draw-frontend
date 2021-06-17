@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import ResizeObserver from "@vue-toys/resize-observer";
 export default {
     directives: {
@@ -90,14 +90,18 @@ export default {
     setup(props) {
         let scaleRatio = ref(0);
 
-        let pixelSizeRow = Math.floor(
-            (props.height - 2 * props.minMarginSize) / props.rows
+        const pixelSizeRow = computed(() =>
+            Math.floor((props.height - 2 * props.minMarginSize) / props.rows)
         );
-        let pixelSizeCol = Math.floor(
-            (props.width - 2 * props.minMarginSize) / props.cols
+        const pixelSizeCol = computed(() =>
+            Math.floor((props.width - 2 * props.minMarginSize) / props.cols)
         );
-        const marginSizeRow = (props.width - pixelSizeRow * props.rows) / 2;
-        const marginSizeCol = (props.height - pixelSizeCol * props.cols) / 2;
+        const marginSizeRow = computed(() =>
+            (props.width - pixelSizeRow.value * props.rows) / 2
+        );
+        const marginSizeCol = computed(() =>
+            (props.height - pixelSizeCol.value * props.cols) / 2
+        );
         return {
             scaleRatio,
             pixelSizeRow,
@@ -126,19 +130,18 @@ export default {
             const drawCtx = this.$refs.drawCanvas.getContext("2d");
             const gridCtx = this.$refs.gridCanvas.getContext("2d");
             drawCtx.fillStyle = "rgb(22,22,22)";
-            console.log(this.height - this.minMarginSize);
             drawCtx.fillRect(
                 this.marginSizeCol,
                 this.marginSizeRow,
                 this.height - 2 * this.marginSizeCol,
                 this.width - 2 * this.marginSizeRow
             );
-
             for (
                 var i = this.marginSizeRow;
                 i <= this.width - this.marginSizeRow;
                 i += this.pixelSizeRow
             ) {
+                
                 let index = (i - this.marginSizeRow) / this.pixelSizeRow;
                 let w = index % 10 == 0 ? 2 : 1;
                 let c = index % 5 == 0 ? "#ffffff" : "#ffffff48";
@@ -170,10 +173,10 @@ export default {
                     o
                 );
             }
+            this.computeRatio({ width: this.$refs.drawCanvas.clientWidth });
         },
         drawPixel(x, y, colorId) {
-            x = x - 1;
-            y = y - 1;
+            if (x >= this.cols || x < 0 || y >= this.rows || y < 0) return
             const drawCtx = this.$refs.drawCanvas.getContext("2d");
             drawCtx.fillStyle = this.colors[colorId];
             drawCtx.fillRect(
@@ -259,10 +262,6 @@ export default {
                 },
             ];
         },
-    },
-    mounted() {
-        this.initCanvas();
-        this.computeRatio({ width: this.$refs.drawCanvas.clientWidth });
     },
 };
 </script>
