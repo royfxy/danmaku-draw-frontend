@@ -1,22 +1,137 @@
-$secondary-text-color: #aaaaaa;
+$gap:10px;
+
+/*light text color*/
+
+$light-primary-text-color: #cccccc;
+$light-secondary-text-color: #aaaaaa;
+
+/*dark text color*/
+
+$dark-primary-text-color: #101010;
+
+/*dark background color*/
+
+$lighter-dark-background-color: #444444;
+$light-dark-background-color:#2c2c2d;
 $dark-background-color: #1c1c1c;
-$darker-background-color: #101010;
-$lighter-background-color:#2c2c2d;
-.content-container {
-    background-color: $dark-background-color;
-    border-radius: 12px;
-    padding: 10px;
-    margin: 10px 0;
+$dark-dark-background-color: #161616;
+$darker-dark-background-color: #101010;
+
+/*light background color*/
+
+$light-background-color:#f5f5f5;
+@mixin button {
+    background-color: $light-dark-background-color;
+    color: $light-primary-text-color;
+    font-weight: bold;
+    white-space: nowrap;
+    height: 36px;
+    border-radius: 5px;
+    padding: 0 15px;
+    border: none;
+    transition: all .15s ease-out;
 }
 
-@mixin secondary {
-    color: $secondary-text-color;
-    font-size: 0.9rem;
+@mixin button-hover {
+    background-color: $lighter-dark-background-color;
 }
 
 @mixin title {
-    color: #ffffff;
-    font-size: 1.2em;
+    color: $light-primary-text-color;
+    font-size: 1rem;
+}
+
+@mixin primary {
+    color: $light-primary-text-color;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+    font-weight: normal;
+}
+
+@mixin secondary {
+    color: $light-secondary-text-color;
+    font-size: 0.9rem;
+}
+
+@mixin large-primary-text {
+    color: $light-primary-text-color;
+    font-size: 1rem;
     letter-spacing: 0.04rem;
     font-weight: bold;
+}
+
+.vip {
+    color: #9e8f5e !important;
+}
+
+.svip {
+    background-image: linear-gradient(45deg, #27241c, #47382d) !important;
+    color: #d8914f !important;
+}
+
+.large-primary-text {
+    @include large-primary-text;
+}
+
+.secondary-text {
+    @include secondary
+}
+
+.bordered-secondary-text {
+    @include secondary;
+    display: inline-block;
+    background-color: $light-dark-background-color;
+    border-radius: 5px;
+    padding: 2px 5px 2px 5px;
+    margin-right: 5px;
+}
+
+.content-container {
+    background-color: $dark-background-color;
+    border-radius: 12px;
+    padding: $gap;
+    margin-top: $gap;
+    display: flex;
+    flex-direction: column;
+}
+
+.container-title {
+    @include secondary;
+    padding-bottom: 5px;
+    border-bottom: 1px $light-dark-background-color solid;
+}
+
+.large-button {
+    @include button;
+}
+
+.large-button:active {
+    background-color: $dark-dark-background-color;
+}
+
+.large-switch-button {
+    @include button;
+}
+
+.large-switch-button:active,
+.large-switch-button.active {
+    background-color: $light-background-color;
+    color: $dark-primary-text-color;
+}
+
+@media (hover:hover) and (pointer:fine) {
+    .large-switch-button:hover {
+        @include button-hover;
+    }
+    .large-button:hover {
+        @include button-hover;
+    }
+    .large-button:active {
+        background-color: $dark-dark-background-color;
+    }
+    .large-switch-button:active,
+    .large-switch-button.active {
+        background-color: $light-background-color;
+        color: $dark-primary-text-color;
+    }
 }

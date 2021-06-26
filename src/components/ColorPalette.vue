@@ -1,5 +1,5 @@
 <template>
-    <div class="content-container color-palette">
+    <div class="color-palette">
         <div
             class="color-container"
             v-for="(color, id) in colors"
@@ -17,7 +17,6 @@ export default {
         colors: undefined,
     },
     setup(props) {
-        console.log(props);
         return { props };
     },
 };
@@ -31,7 +30,7 @@ export default {
 }
 .color-container {
     display: flex;
-    background-color: $lighter-background-color;
+    background-color: $light-dark-background-color;
     border-radius: 7px;
     padding: 2px;
 }

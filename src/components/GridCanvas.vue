@@ -272,7 +272,7 @@ export default {
     position: relative;
     height: 100vmin;
     width: 100vmin;
-    background-color: $darker-background-color;
+    background-color: $darker-dark-background-color;
     overflow: overlay;
 }
 bold {

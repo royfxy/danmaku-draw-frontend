@@ -1,18 +1,26 @@
 <template>
-    <div class="content-container music-panel">
+    <div class="music-panel">
         <div class="player">
-            <audio id="music" src="" />
+            <audio
+                id="music"
+                muted="muted"
+                :src="musicData.src"
+                ref="music"
+                @ended="musicEnded"
+            />
             <div class="music-content">
-                <img class="music-cover" src="@/assets/default-cover.jpg" />
+                <img class="music-cover" :src="musicData.cover" />
 
                 <div class="music-info">
-                    <div id="music-title">{{ musicInfo.title }}</div>
-                    <div class="secondary" id="music-artists">
-                        {{ musicInfo.artist }}
-                    </div>
-                    <div class="secondary" id="music-orderer">
-                        由 {{ musicInfo.orderer }} 点歌
-                    </div>
+                    <auto-scroll id="music-title">{{
+                        musicData.title
+                    }}</auto-scroll>
+                    <auto-scroll class="secondary" id="music-artists">
+                        {{ musicData.artists }}
+                    </auto-scroll>
+                    <auto-scroll class="secondary" id="music-orderer">
+                        由 {{ musicData.orderer }} 点歌
+                    </auto-scroll>
                 </div>
             </div>
             <div class="music-source-info">
@@ -24,44 +32,116 @@
                 >
             </div>
         </div>
-        <div class="music-playlist-container">
-            <ol class="music-playlist" id="playlist">
-                <li v-for="music in playlist" v-bind:key="music">
+
+        <auto-scroll :horizontal="false" class="playlist-container">
+            <div class="playlist-item playlist-nextplay">
+                <span v-show="playlistDisplay.length <= 1"> 播放列表为空 </span>
+                <span v-show="playlistDisplay.length > 1">
+                    下一首：{{ playlistDisplay[1] }}
+                </span>
+            </div>
+            <ol class="playlist" id="playlist" start="2">
+                <li
+                    class="playlist-item"
+                    v-for="(music, index) in playlistDisplay.slice(2)"
+                    v-bind:key="index"
+                >
                     {{ music }}
                 </li>
             </ol>
-        </div>
+        </auto-scroll>
     </div>
 </template>
 
 
 
 <script>
-import { reactive, ref } from "vue";
+import { computed, nextTick, reactive, ref, watch } from "vue";
+import AutoScroll from "@/components/AutoScroll.vue";
 
 export default {
-    setup() {
+    components: {
+        AutoScroll,
+    },
+    props: {
+        playlist: Array,
+    },
+    setup(props, context) {
+        const music = ref(null);
         const defaultData = {
-            musicInfo: {
-                title: "未播放",
-                artist: "- -",
-                orderer: "- -",
-            },
+            id: null,
+            src: "",
+            title: "未播放",
+            artists: "- -",
+            orderer: "- -",
+            cover: require("@/assets/default-cover.jpg"),
         };
-        
-        const musicInfo = reactive(defaultData.musicInfo);
-        const playlist = ref([]);
-        const play = function() {
-            
-        }
-        return { musicInfo, playlist, play};
+        const musicData = reactive({ ...defaultData });
+
+        const play = async function (
+            musicId,
+            playURL,
+            title,
+            artists,
+            coverURL,
+            orderer
+        ) {
+            musicData.id = musicId;
+            musicData.src = playURL;
+            musicData.title = title;
+            musicData.artists = artists.join(", ");
+            musicData.orderer = orderer;
+            musicData.cover = coverURL;
+            await nextTick();
+            music.value.play();
+            music.value.muted = false;
+        };
+
+        const requestMusic = function () {
+            context.emit("requestMusic");
+        };
+
+        const playlistDisplay = computed(() => {
+            return props.playlist.map(
+                (music) => `${music.user_name} - ${music.song_name} -
+                    ${music.artists}`
+            );
+        });
+
+        watch(
+            () => props.playlist,
+            (newValue) => {
+                if (newValue.length === 0) {
+                    Object.assign(musicData, defaultData);
+                    return;
+                }
+                if (newValue[0].song_id == musicData.id) return;
+                requestMusic();
+            }
+        );
+
+        const updatePlaylist = function () {};
+        const musicEnded = function (e) {
+            console.log("ended", e);
+            context.emit("playEnded")
+        };
+
+        return {
+            props,
+            playlistDisplay,
+            music,
+            musicData,
+            play,
+            requestMusic,
+            updatePlaylist,
+            musicEnded,
+        };
     },
 };
 </script>
 
 
 <style lang="scss" scoped>
-// @import url("~@/assets/scss/_imports.scss");
 
 .music-panel {
     white-space: nowrap;
@@ -88,16 +168,20 @@ export default {
 .music-info {
     @include secondary;
     display: flex;
+    overflow: hidden;
     flex-direction: column;
     justify-content: center;
     align-items: stretch;
-    padding-left: 10px;
+    padding: 0 $gap;
     height: 100px;
+    * {
+        margin: 2px 0;
+    }
 }
 
 .music-source-info {
     @include secondary;
-    margin-top: 10px;
+    margin-top: $gap;
 }
 
 .netease-icon {
@@ -118,27 +202,43 @@ export default {
 }
 
 #music-title {
-    @include title;
+    @include large-primary-text;
 }
 
-.music-playlist-container {
-    height: 110px;
-    background-color: $darker-background-color;
+.playlist-container {
+    height: 130px;
+    background-color: $darker-dark-background-color;
     border-radius: 5px;
-    padding: 10px;
     overflow: hidden;
 }
 
-.music-playlist {
-    padding: 0 1.5rem;
+.playlist {
+    @include secondary;
+    overflow: hidden;
+    padding: 0 3em;
     margin: 0;
+}
+
+.playlist-nextplay {
+    @include secondary;
+    position: sticky;
+    padding: 3px 1em;
+    line-height: 1em;
+    border: 3px $darker-dark-background-color solid;
+    background-color: $dark-background-color;
+    top: 0px;
+    border-radius: 5px;
+}
+
+.playlist-item {
+    line-height: 1.5em;
 }
 
 @media (max-width: 600px) {
     .music-panel {
         grid-template-rows: 1fr 1fr;
         grid-template-columns: 1fr;
-        row-gap: 10px;
+        row-gap: $gap;
     }
 }
 </style>
