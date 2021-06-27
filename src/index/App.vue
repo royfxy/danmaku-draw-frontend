@@ -105,7 +105,7 @@ export default {
         LiveMessage,
     },
     setup() {
-        setBaseURL("https://192.168.31.119");
+        setBaseURL("https://dd.fxy.one:233");
 
         // Canvas
         const canvasParms = reactive({
