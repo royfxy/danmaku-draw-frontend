@@ -120,9 +120,7 @@ export default {
             }
         );
 
-        const updatePlaylist = function () {};
-        const musicEnded = function (e) {
-            console.log("ended", e);
+        const musicEnded = function () {
             context.emit("playEnded")
         };
 
@@ -133,7 +131,6 @@ export default {
             musicData,
             play,
             requestMusic,
-            updatePlaylist,
             musicEnded,
         };
     },

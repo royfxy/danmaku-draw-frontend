@@ -1,6 +1,4 @@
 <template>
-    <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
-    <!-- <component  :is="script" src="https://unpkg.com/sweetalert/dist/sweetalert.min.js" defer type="module"></component> -->
     <div id="head-room">
         <grid-canvas
             :width="canvasParms.width"
@@ -14,7 +12,9 @@
         />
     </div>
     <div id="tail-room">
-        <div class="content-container" id="buttons-container" v-if="false">
+        <div class="content-container">
+            <div class="container-title">操作</div>
+            <div id="buttons-container">
             <button
                 class="large-switch-button"
                 :class="{ active: canvasParms.zoom !== 1 }"
@@ -30,83 +30,40 @@
                 隐藏网格
             </button>
             <button class="large-button" @click="() => {}">保存图像</button>
-        </div>
-
-        <div class="content-container">
+            </div>
+            </div>
+            <div class="content-container">
+            <div class="container-title">颜色</div>
             <color-palette
                 :colors="canvasParms.colors"
                 :key="canvasParms.colors"
             />
         </div>
 
-        <div class="content-container" id="rules">
-            <div class="large-primary-text">像素涂色：行-列-颜色编号</div>
-            <div class="secondary-text">
-                将第 11 行 45 列的像素涂为 14 号色，发送弹幕：
-                <span class="bordered-secondary-text"> 11-45-14 </span>
-                <br />
-            </div>
-
-            <div class="large-primary-text">点歌：点歌-关键词或歌曲 ID</div>
-            <div class="secondary-text">
-                <span class="bordered-secondary-text">
-                    点歌-Hotel California
-                </span>
-                <span class="bordered-secondary-text">
-                    点歌-Kygo Firestone
-                </span>
-                <span class="bordered-secondary-text"> 点歌-16435049 </span>
-                <span class="bordered-secondary-text"> 切歌 </span>
-            </div>
-        </div>
-
-        <div class="content-container">
-            <music
-                :playlist="playlist"
-                @requestMusic="playHandler"
-                @playEnded="skip"
-                ref="musicPlayer"
-            ></music>
-        </div>
-
-        <div class="content-container">
-            <live-message
-                :hints="messages.hints"
-                ref="liveMessageDisplay"
-            />
-        </div>
     </div>
 </template>
 
 <script>
-import Music from "@/components/Music.vue";
 import ColorPalette from "@/components/ColorPalette.vue";
 import GridCanvas from "@/components/GridCanvas.vue";
-import LiveMessage from "@/components/LiveMessage.vue";
 
 import {
     setBaseURL,
-    setToken,
     requestOperation,
     msgHandler,
     connectWebsocket,
 } from "@/api/msgHandler.js";
-
-import Swal from "sweetalert2";
 
 import { nextTick, onMounted, reactive, ref } from "vue";
 
 export default {
     name: "App",
     components: {
-        Music,
         ColorPalette,
         GridCanvas,
-        LiveMessage,
     },
     setup() {
-        setBaseURL("https://dd.fxy.one:233");
-
+        setBaseURL(window.location.origin);
         // Canvas
         const canvasParms = reactive({
             colors: null,
@@ -143,86 +100,24 @@ export default {
             }
         }
 
+        const zoomCanvas = function() {
+            canvasParms.zoom = canvasParms.zoom == 1 ? 2 : 1;
+        }
+
         msgHandler.register(["INIT_CANVAS"], initCanvas);
         msgHandler.register("DRAW_PIXEL", drawPixel);
         onMounted(() => {
             requestOperation("/api/canvas/canvas");
         });
 
-        // TODO: Music
-        const musicPlayer = ref(null);
-        const playlist = ref([]);
-        const updatePlaylist = function (data) {
-            playlist.value = data;
-        };
-        const playMusic = function (data) {
-            musicPlayer.value.play(
-                data.info.id,
-                data.play_url,
-                data.info.name,
-                data.info.artists,
-                data.info.cover_url,
-                data.user_name
-            );
-        };
-
-        msgHandler.register("PLAY_SONG", playMusic);
-        msgHandler.register("UPDATE_PLAYLIST", updatePlaylist);
-        const playHandler = function () {
-            requestOperation("/api/music/play");
-        };
-        const skip = function () {
-            requestOperation("/api/music/skip");
-        };
-        onMounted(async () => {
-            const { value: token } = await Swal.fire({
-                title: "Token",
-                input: "text",
-                allowOutsideClick: false,
-            });
-            console.log("token", token);
-            setToken(token);
-            requestOperation("/api/music/playlist");
-        });
-
-        // TODO: Message
-        const messages = reactive({ hints: []});
-        const liveMessageDisplay = ref(null)
-        const initMessages = function (data) {
-            messages.hints = data.hints;
-        };
-        msgHandler.register("INIT_MESSAGE", initMessages);
-        onMounted(() => {
-            requestOperation("/api/message/hints");
-        });
-
-        const newMessage = function(data){
-            liveMessageDisplay.value.newMessage(data.text, data.viplevel)
-        }
-        msgHandler.register("TEXT_MESSAGE", newMessage)
-
         // Websockets
         connectWebsocket("/api/canvas");
-        connectWebsocket("/api/message");
 
         return {
             canvas,
             canvasParms,
-            musicPlayer,
-            updatePlaylist,
-            playMusic,
-            playHandler,
-            playlist,
-            skip,
-            messages,
-            liveMessageDisplay,
-            initMessages,
+            zoomCanvas
         };
-    },
-    methods: {
-        zoomCanvas() {
-            this.canvasParms.zoom = this.canvasParms.zoom == 1 ? 2 : 1;
-        },
     },
 };
 </script>
@@ -259,35 +154,14 @@ body {
     overflow-y: auto;
 }
 
-#tail-room > * {
-    flex: 0;
-}
-
-#tail-room > :last-child {
-    margin-bottom: $gap;
-    flex: 1;
-}
 #buttons-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     column-gap: 5px;
 }
 
-#rules {
-    * {
-        margin-bottom: 5px;
-    }
-
-    .large-primary-text {
-        margin: 10px 0;
-    }
-
-    :first-child {
-        margin-top: 0;
-    }
-
-    :last-child {
-        margin-bottom: 0;
-    }
+.container-title{
+    margin-bottom: $gap;
 }
+
 </style>
