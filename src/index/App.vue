@@ -29,7 +29,7 @@
             >
                 隐藏网格
             </button>
-            <button class="large-button" @click="() => {}">保存图像</button>
+            <button class="large-button" @click="saveCanvasAsImage">保存图像</button>
             </div>
             </div>
             <div class="content-container">
@@ -110,13 +110,25 @@ export default {
             requestOperation("/api/canvas/canvas");
         });
 
+        const saveCanvasAsImage = function(){
+            let link = document.createElement("a")
+            let imageURL = canvas.value.canvasToImage()
+            document.body.appendChild(link)
+            link.setAttribute("href", imageURL)
+            link.setAttribute("download", "canvas" + String(Date.now()) + ".png")
+            link.click()
+            document.body.removeChild(link)
+
+        }
+
         // Websockets
         connectWebsocket("/api/canvas");
 
         return {
             canvas,
             canvasParms,
-            zoomCanvas
+            zoomCanvas,
+            saveCanvasAsImage
         };
     },
 };

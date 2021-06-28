@@ -189,6 +189,9 @@ export default {
         computeRatio({ width }) {
             this.scaleRatio = width / this.width;
         },
+        canvasToImage(){
+            return this.$refs.drawCanvas.toDataURL("image/png").replace("image/png","image/octet-stream")
+        }
     },
     computed: {
         canvasStyle() {
