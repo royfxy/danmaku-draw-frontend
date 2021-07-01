@@ -103,8 +103,8 @@ export default {
 
         const playlistDisplay = computed(() => {
             return props.playlist.map(
-                (music) => `${music.user_name} - ${music.song_name} -
-                    ${music.artists}`
+                (song) => `${song.user_name} - ${song.song_name} -
+                    ${song.artists}`
             );
         });
 
@@ -115,8 +115,10 @@ export default {
                     Object.assign(musicData, defaultData);
                     return;
                 }
-                if (newValue[0].song_id == musicData.id) return;
-                requestMusic();
+                if (newValue[0].song_id != musicData.id || music.value.paused) {
+                    requestMusic();
+                }
+                
             }
         );
 
