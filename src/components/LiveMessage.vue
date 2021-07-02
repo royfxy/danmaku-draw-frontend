@@ -103,8 +103,7 @@ export default {
 
 .live-message-container {
     flex: 1;
-
-    min-height: 80px;
+    min-height: 50px;
     overflow: hidden;
     position: relative;
     * {
