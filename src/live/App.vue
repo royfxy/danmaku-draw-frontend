@@ -239,7 +239,7 @@ body {
     display: flex;
     flex-direction: column;
     padding: 0 $gap;
-    flex: 540px 1;
+    flex: 1;
     min-height: 100vmin;
     overflow-y: auto;
 }
