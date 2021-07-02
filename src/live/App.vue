@@ -5,14 +5,12 @@
             :height="canvasParms.height"
             :cols="canvasParms.cols"
             :rows="canvasParms.rows"
-            :zoom="canvasParms.zoom"
             :gridShow="canvasParms.gridShow"
             :colors="canvasParms.colors"
             ref="canvas"
         />
     </div>
     <div id="tail-room">
-
         <div class="content-container">
             <color-palette
                 :colors="canvasParms.colors"
@@ -21,13 +19,20 @@
         </div>
 
         <div class="content-container" id="rules">
-            <div class="large-primary-text">像素涂色：行-列-颜色编号</div>
+            <div class="large-primary-text">
+                像素涂色：行-列-颜色编号
+            </div>
             <div class="secondary-text">
                 将第 11 行 45 列的像素涂为 14 号色，发送弹幕：
                 <span class="bordered-secondary-text"> 11-45-14 </span>
-                <br />
             </div>
-
+            <div class="large-primary-text">
+                批量涂色：将行或列替换为 起始编号:结束编号
+            </div>
+            <div class="secondary-text">
+                将第 1 到第 45 行的第 1 列的像素都涂为 4 号色，发送弹幕：
+                <span class="bordered-secondary-text"> 11:45-1-4 </span>
+            </div>
             <div class="large-primary-text">点歌：点歌-关键词或歌曲 ID</div>
             <div class="secondary-text">
                 <span class="bordered-secondary-text">
@@ -51,10 +56,7 @@
         </div>
 
         <div class="content-container">
-            <live-message
-                :hints="messages.hints"
-                ref="liveMessageDisplay"
-            />
+            <live-message :hints="messages.hints" ref="liveMessageDisplay" />
         </div>
     </div>
 </template>
@@ -95,18 +97,25 @@ export default {
             cols: null,
             rows: null,
             gridShow: true,
-            zoom: 1,
         });
 
         const canvas = ref(null);
+
+        function coordinateOf(pos) {
+            return [Math.floor(pos / canvasParms.cols), pos % canvasParms.cols];
+        }
+
         function drawPixel(data) {
-            function coordinateOf(pos) {
-                return [
-                    Math.floor(pos / canvasParms.cols),
-                    pos % canvasParms.cols,
-                ];
-            }
             canvas.value.drawPixel(...coordinateOf(data.pos), data.colorid);
+        }
+
+        function drawMutiplePixels(data) {
+            for (var index in data.pos) {
+                canvas.value.drawPixel(
+                    ...coordinateOf(data.pos[index]),
+                    data.colorid
+                );
+            }
         }
 
         async function initCanvas(data) {
@@ -123,12 +132,9 @@ export default {
             }
         }
 
-        const zoomCanvas = function() {
-            canvasParms.zoom = canvasParms.zoom == 1 ? 2 : 1;
-        }
-
         msgHandler.register(["INIT_CANVAS"], initCanvas);
         msgHandler.register("DRAW_PIXEL", drawPixel);
+        msgHandler.register("DRAW_MULTIPLE_PIXELS", drawMutiplePixels);
         onMounted(() => {
             requestOperation("/api/canvas/canvas");
         });
@@ -170,8 +176,8 @@ export default {
         });
 
         // TODO: Message
-        const messages = reactive({ hints: []});
-        const liveMessageDisplay = ref(null)
+        const messages = reactive({ hints: [] });
+        const liveMessageDisplay = ref(null);
         const initMessages = function (data) {
             messages.hints = data.hints;
         };
@@ -180,10 +186,10 @@ export default {
             requestOperation("/api/message/hints");
         });
 
-        const newMessage = function(data){
-            liveMessageDisplay.value.newMessage(data.text, data.viplevel)
-        }
-        msgHandler.register("TEXT_MESSAGE", newMessage)
+        const newMessage = function (data) {
+            liveMessageDisplay.value.newMessage(data.text, data.viplevel);
+        };
+        msgHandler.register("TEXT_MESSAGE", newMessage);
 
         // Websockets
         connectWebsocket("/api/canvas");
@@ -192,7 +198,6 @@ export default {
         return {
             canvas,
             canvasParms,
-            zoomCanvas,
             musicPlayer,
             updatePlaylist,
             playMusic,
