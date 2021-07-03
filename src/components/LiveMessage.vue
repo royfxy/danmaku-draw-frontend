@@ -1,6 +1,6 @@
 <template>
     <div class="message-container">
-        <div class="container-title">提示</div>
+        <div class="container-title">提示 <span class="right-text">{{fixedMessage}}</span></div>
         <transition name="mode-fade" mode="out-in">
             <div class="hint-text" v-if="transationFlag">{{ curHint }}</div>
             <div class="hint-text" v-else>{{ curHint }}</div>
@@ -45,6 +45,10 @@ export default {
             type: Number,
             default: 50,
         },
+        fixedMessage: {
+            type: String,
+            default: "",
+        }
     },
     setup(props) {
         const curHint = ref("欢迎");
@@ -85,6 +89,10 @@ export default {
 
 .sub-container {
     transition: all 0.15s ease-out;
+}
+
+.right-text{
+    float: right;
 }
 
 .mode-fade-enter-active,
