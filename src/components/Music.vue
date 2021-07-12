@@ -7,6 +7,7 @@
                 :src="musicData.src"
                 ref="music"
                 @ended="musicEnded"
+                @error="musicEnded"
             />
             <div class="music-content">
                 <img class="music-cover" :src="musicData.cover" />

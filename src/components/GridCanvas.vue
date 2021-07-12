@@ -129,7 +129,7 @@ export default {
             }
             const drawCtx = this.$refs.drawCanvas.getContext("2d");
             const gridCtx = this.$refs.gridCanvas.getContext("2d");
-            drawCtx.fillStyle = "rgb(22,22,22)";
+            drawCtx.fillStyle = "#212121";
             drawCtx.fillRect(
                 this.marginSizeCol,
                 this.marginSizeRow,

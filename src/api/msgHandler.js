@@ -2,7 +2,7 @@ let baseURL
 let token
 
 export function setBaseURL(base) {
-    base = base.replace(/^/ | /$/g, '')
+    base = base.replace(/^\/ | \/$/g, '')
     base = base.replace(/^https?:\/\//i, '')
     baseURL = base
 }

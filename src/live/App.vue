@@ -89,6 +89,7 @@ export default {
     },
     setup() {
         setBaseURL(window.location.origin);
+        
         // Canvas
         const canvasParms = reactive({
             colors: null,
@@ -139,7 +140,7 @@ export default {
             requestOperation("/api/canvas/canvas");
         });
 
-        // TODO: Music
+        // Music
         const musicPlayer = ref(null);
         const playlist = ref([]);
         const updatePlaylist = function (data) {
@@ -175,7 +176,7 @@ export default {
             requestOperation("/api/music/playlist");
         });
 
-        // TODO: Message
+        // Message
         const messages = reactive({ hints: [] });
         const liveMessageDisplay = ref(null);
         const initMessages = function (data) {
