@@ -86,6 +86,15 @@ export default {
             canvas.value.drawPixel(...coordinateOf(data.pos), data.colorid);
         }
 
+        function drawMutiplePixels(data) {
+            for (var index in data.pos) {
+                canvas.value.drawPixel(
+                    ...coordinateOf(data.pos[index]),
+                    data.colorid
+                );
+            }
+        }
+
         async function initCanvas(data) {
             canvasParms.colors = data.colors;
             canvasParms.cols = data.col_num;
@@ -106,6 +115,7 @@ export default {
 
         msgHandler.register(["INIT_CANVAS"], initCanvas);
         msgHandler.register("DRAW_PIXEL", drawPixel);
+        msgHandler.register("DRAW_MULTIPLE_PIXELS", drawMutiplePixels);
         onMounted(() => {
             requestOperation("/api/canvas/canvas");
         });
