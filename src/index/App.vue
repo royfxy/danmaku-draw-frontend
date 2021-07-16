@@ -76,13 +76,11 @@ export default {
         });
 
         const canvas = ref(null);
+        function coordinateOf(pos) {
+            return [Math.floor(pos / canvasParms.cols), pos % canvasParms.cols];
+        }
+
         function drawPixel(data) {
-            function coordinateOf(pos) {
-                return [
-                    Math.floor(pos / canvasParms.cols),
-                    pos % canvasParms.cols,
-                ];
-            }
             canvas.value.drawPixel(...coordinateOf(data.pos), data.colorid);
         }
 
