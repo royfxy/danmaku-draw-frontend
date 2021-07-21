@@ -56,7 +56,7 @@
         </div>
 
         <div class="content-container">
-            <live-message :hints="messages.hints" :fixedMessage="'欢迎加群：931320727'" ref="liveMessageDisplay" />
+            <live-message :hints="messages.hints" :fixedMessage="'欢迎加入 QQ 讨论群：931320727'" ref="liveMessageDisplay" />
         </div>
     </div>
 </template>
