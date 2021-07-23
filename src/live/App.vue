@@ -20,28 +20,28 @@
 
         <div class="content-container" id="rules">
             <div class="large-primary-text">
-                像素涂色：行-列-颜色编号
+                像素涂色：行－列－颜色编号
             </div>
             <div class="secondary-text">
                 将第 11 行 45 列的像素涂为 14 号色，发送弹幕：
-                <span class="bordered-secondary-text"> 11-45-14 </span>
+                <span class="bordered-secondary-text"> 11－45－14 </span>
             </div>
             <div class="large-primary-text">
                 批量涂色：将行或列替换为 起始编号:结束编号
             </div>
             <div class="secondary-text">
                 将第 1 到第 45 行的第 1 列的像素都涂为 4 号色，发送弹幕：
-                <span class="bordered-secondary-text"> 11:45-1-4 </span>
+                <span class="bordered-secondary-text"> 11:45－1－4 </span>
             </div>
-            <div class="large-primary-text">点歌：点歌-关键词或歌曲 ID</div>
+            <div class="large-primary-text">点歌：点歌－关键词或歌曲 ID</div>
             <div class="secondary-text">
                 <span class="bordered-secondary-text">
-                    点歌-Hotel California
+                    点歌－Hotel California
                 </span>
                 <span class="bordered-secondary-text">
-                    点歌-Kygo Firestone
+                    点歌－Kygo Firestone
                 </span>
-                <span class="bordered-secondary-text"> 点歌-16435049 </span>
+                <span class="bordered-secondary-text"> 点歌－16435049 </span>
                 <span class="bordered-secondary-text"> 切歌 </span>
             </div>
         </div>
