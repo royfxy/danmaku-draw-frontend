@@ -30,7 +30,7 @@
                 批量涂色：将行或列替换为 起始编号:结束编号
             </div>
             <div class="secondary-text">
-                将第 1 到第 45 行的第 1 列的像素都涂为 4 号色，发送弹幕：
+                将第 11 到第 45 行的第 1 列的像素都涂为 4 号色，发送弹幕：
                 <span class="bordered-secondary-text"> 11:45－1－4 </span>
             </div>
             <div class="large-primary-text">点歌：点歌－关键词或歌曲 ID</div>
